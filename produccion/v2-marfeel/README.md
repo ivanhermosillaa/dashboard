@@ -1,0 +1,80 @@
+# Producción editorial · Meganoticias, Mega y Megatiempo
+
+Interfaz de producción editorial y audiencia. Datos de octubre de 2026.
+
+## Estructura
+
+```
+produccion_web/
+├── index.html              # interfaz (HTML, CSS y JavaScript en un archivo)
+└── data/
+    ├── produccion.json     # metadatos, portales y artículos (producción)
+    ├── marfeel.json        # audiencia por URL (exportaciones de Marfeel)
+    └── marfeel.example.json  # ejemplo de formato, no se carga
+```
+
+## Cómo publicar
+
+Sube la carpeta completa al servidor, con `index.html` y `data/` en el mismo nivel. Para probar en local, sirve la carpeta con un servidor:
+
+```bash
+cd produccion_web
+python3 -m http.server 8000
+```
+
+Luego abre `http://localhost:8000`. No funciona con doble clic, porque el navegador bloquea la lectura de JSON desde archivos locales.
+
+## Secciones de la página
+
+1. Filtro de sitios y periodo (mes, año o rango de fechas).
+2. Comparativa de portales.
+3. Tarjetas resumen.
+4. Publicaciones por día y por sección.
+5. Mapa de calor de publicación por hora.
+6. Periodistas.
+7. Audiencia · Marfeel.
+8. Temas más utilizados.
+9. Artículos.
+10. Calidad de datos.
+
+## Producción (`produccion.json`)
+
+Contiene tres bloques: `meta` (versión, fecha de generación, zona horaria y meses), `portals` (id, nombre, color y dominio) y `articles` (portal, fecha y hora, sección, formato, título, autor, estado y tipo de contenido). Las métricas se calculan en el navegador a partir de `articles`.
+
+Para actualizar, reemplaza el archivo con una nueva generación en el mismo formato.
+
+## Audiencia (`marfeel.json`)
+
+Cada fila es una URL de un portal con sus páginas vistas y usuarios únicos. Las filas no traen fecha: Marfeel entrega totales para el periodo indicado en `meta.period`.
+
+```json
+{
+  "meta": {
+    "source": "marfeel",
+    "period": { "from": "2026-10-01", "to": "2026-10-31" },
+    "scope": "Solo notas publicadas en octubre de 2026"
+  },
+  "rows": [
+    { "portal": "meganoticias",
+      "url": "https://www.meganoticias.cl/nacional/533238-nueva-moneda.html",
+      "pageviews": 97382, "users": 84586 }
+  ]
+}
+```
+
+**Reglas de cruce.** Las URLs se normalizan antes de comparar: se quita el protocolo, el `www.`, los parámetros, el fragmento y la barra final, y se pasa a minúsculas.
+
+**Métricas.** `users` es el usuario único por URL. No es sumable entre URLs: la suma de todas las URLs es mayor que el total de usuarios únicos del sitio. La tarjeta lo indica en su rótulo.
+
+**Cobertura del periodo.** Si el periodo seleccionado queda fuera de `meta.period`, la tarjeta lo indica y no muestra cifras.
+
+**Alcance.** `marfeel.json` contiene solo notas publicadas en octubre de 2026. Las URLs de Marfeel que no están en `produccion.json` (shorts, capítulos y otros formatos) se cuentan como "Sin registro en producción". Si un portal aparece en `meta.incomplete`, la tarjeta muestra un aviso de exportación incompleta.
+
+## Calidad de datos
+
+Al final de la página. Evalúa el sitio y el periodo seleccionados con once controles: títulos repetidos, fechas en URL, firmas, escapes, fechas futuras, tasa de no publicadas, días sin publicar y antigüedad de la carga. Cada control permite revisar los casos concretos.
+
+## Requisitos
+
+- Conexión a internet para Roboto (Google Fonts) y Chart.js (cdnjs).
+- Navegador moderno.
