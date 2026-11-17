@@ -1,0 +1,1572 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Producción editorial · Meganoticias, Mega y Megatiempo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+[hidden]{display:none!important}
+:root{--bg:#F4F6F9;--surface:#fff;--text:#18202F;--muted:#6A7385;--line:#E4E8EF;--radius:14px;--shadow:0 1px 2px rgba(16,24,40,.06)}
+*{box-sizing:border-box}
+body{margin:0;font-family:Roboto,system-ui,-apple-system,"Segoe UI",sans-serif;background:var(--bg);color:var(--text);font-size:15px;line-height:1.5}
+/* Barra superior */
+.topbar{display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap;padding:14px 32px;background:var(--surface);border-bottom:1px solid var(--line);position:sticky;top:0;z-index:5}
+.brand{display:flex;gap:12px;align-items:center}
+.logo{width:40px;height:40px;border-radius:10px;background:#18202F;color:#fff;display:grid;place-items:center;font-weight:700}
+h1{font-size:18px;margin:0;font-weight:700}
+.sub{margin:0;color:var(--muted);font-size:13px}
+.controls{display:flex;align-items:flex-end;gap:16px;flex-wrap:wrap}
+.period{display:flex;align-items:flex-end;gap:12px;flex-wrap:wrap}
+.field{display:flex;flex-direction:column;font-size:12px;color:var(--muted);gap:4px}
+select,input{font:inherit;color:var(--text);background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:8px 12px;min-height:38px}
+button{font:inherit;color:var(--text);background:var(--surface);border:1px solid var(--line);padding:8px 14px;border-radius:8px;cursor:pointer}
+button:not(:disabled):hover{border-color:var(--text)}
+button:disabled{opacity:.45;cursor:default}
+:focus-visible{outline:2px solid #18202F;outline-offset:2px}
+.tabs{display:inline-flex;background:#EEF1F6;border-radius:10px;padding:4px;gap:4px;flex-wrap:wrap}
+.tabs button{border:0;background:transparent;padding:8px 14px;border-radius:7px;font-weight:500;color:var(--muted);display:inline-flex;align-items:center}
+.tabs button:hover{color:var(--text)}
+.tabs button[aria-pressed=true]{background:var(--surface);color:var(--text);box-shadow:var(--shadow);font-weight:600}
+.dot{width:9px;height:9px;border-radius:50%;display:inline-block;margin-right:8px;flex:none}
+/* Layout */
+.wrap{max-width:1280px;margin:0 auto;padding:24px 32px 48px;display:grid;gap:20px}
+.ctx{margin:0;color:var(--muted);font-size:13px}
+.grid-2{display:grid;grid-template-columns:1.6fr 1fr;gap:20px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:20px;box-shadow:var(--shadow);min-width:0}
+.card-h{margin-bottom:16px}
+.card-h h2{font-size:16px;margin:0;font-weight:600}
+.card-h p{margin:2px 0 0;color:var(--muted);font-size:13px}
+.row{display:flex;justify-content:space-between;align-items:flex-end;gap:16px;flex-wrap:wrap}
+.filters{display:flex;gap:10px;flex-wrap:wrap}
+.chart{position:relative;height:300px}
+.muted{color:var(--muted)}
+.note{font-size:12px;color:var(--muted);margin:14px 0 0}
+/* Comparativa */
+.pname{border:0;background:transparent;padding:0;font-weight:600;display:inline-flex;align-items:center;cursor:pointer;color:var(--text)}
+.pname:hover{text-decoration:underline}
+tr.selected{background:#F3F6FB}
+tr[data-p]{cursor:pointer}
+/* KPIs */
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:16px}
+.kpi{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:18px 20px;box-shadow:var(--shadow)}
+.kpi-label{font-size:13px;color:var(--muted);margin:0 0 6px}
+.kpi-value{font-size:28px;font-weight:700;margin:0;font-variant-numeric:tabular-nums;letter-spacing:-.01em}
+.delta{display:block;font-size:12px;color:var(--muted);margin-top:6px}
+.delta.up{color:#137A60}.delta.down{color:#8A1F1A}
+/* Tablas */
+.table-wrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:14px}
+th,td{text-align:left;padding:10px 12px;border-bottom:1px solid var(--line);vertical-align:middle}
+th{font-size:12px;text-transform:uppercase;letter-spacing:.04em;color:var(--muted);font-weight:600;white-space:nowrap}
+th[data-k]{cursor:pointer;user-select:none}
+th[data-k]:hover{color:var(--text)}
+th[aria-sort=ascending]::after{content:" ▲"}
+th[aria-sort=descending]::after{content:" ▼"}
+td.num,th.num{text-align:right;font-variant-numeric:tabular-nums}
+td.title{max-width:440px}
+td.title a{color:var(--text);text-decoration:none}
+td.title a:hover{text-decoration:underline}
+.nowrap{white-space:nowrap;color:var(--muted)}
+.hour{white-space:nowrap;font-variant-numeric:tabular-nums}
+tbody tr:not(.selected):hover{background:#F8FAFC}
+.empty{text-align:center;color:var(--muted);padding:28px}
+.chip{font-size:12px;background:#EEF1F6;color:var(--text);padding:2px 8px;border-radius:999px;white-space:nowrap}
+.fmt{font-size:12px}
+.status{font-size:12px;padding:2px 8px;border-radius:999px;white-space:nowrap}
+.s-editorial{background:#E3F5EF;color:#137A60}
+.s-sponsored{background:#EDEFF3;color:#4B5366}
+.s-unpublished{background:#FDECEA;color:#8A1F1A}
+.tag{font-size:11px;background:#EEF0F4;color:var(--muted);padding:1px 6px;border-radius:6px;margin-left:6px}
+.pager{display:flex;justify-content:center;align-items:center;gap:16px;margin-top:16px;font-size:13px;color:var(--muted)}
+.bar{height:8px;background:#EEF1F6;border-radius:4px;overflow:hidden;min-width:120px}
+.bar span{display:block;height:100%}
+/* Mapa de calor */
+.heat{border-collapse:separate;border-spacing:3px;min-width:1120px;font-size:12px}
+.heat th,.heat td{padding:0;border:0}
+.hcol{font-size:10px;text-align:center;color:var(--muted);font-weight:500;text-transform:none;letter-spacing:0;width:44px}
+.hday{text-align:left;padding-right:10px!important;font-size:12px;color:var(--muted);text-transform:none;letter-spacing:0;font-weight:500}
+.hm{width:44px;height:30px;text-align:center;border-radius:5px;font-size:11px;font-variant-numeric:tabular-nums}
+.heat .num{padding-left:10px;font-size:12px}
+/* Calidad de datos */
+.q-summary{display:flex;gap:8px;flex-wrap:wrap}
+.q-chip,.q-badge{font-size:12px;padding:3px 10px;border-radius:999px;white-space:nowrap;font-weight:500}
+.q-ok{background:#E3F5EF;color:#137A60}
+.q-warn{background:#FFF3D6;color:#7A5300}
+.q-crit{background:#FDECEA;color:#8A1F1A}
+.q-info{background:#EEF1F6;color:#4B5366}
+.q-list{margin:8px 0 0;padding-left:18px;font-size:13px}
+.q-list li{margin:4px 0}
+details summary{cursor:pointer;color:var(--muted);font-size:13px;margin-top:6px}
+/* Informes */
+.rep-tabs{margin-bottom:16px}
+.rep-tabs button[aria-selected=true]{background:var(--surface);color:var(--text);box-shadow:var(--shadow);font-weight:600}
+.rep-chart{position:relative;height:300px;margin-bottom:16px}
+.rep-h{font-size:14px;font-weight:600;margin:20px 0 8px}
+.idx-hi{color:#137A60;font-weight:600}
+.idx-lo{color:#8A1F1A;font-weight:600}
+/* Popup de audiencia */
+.aud-dialog{border:0;padding:0;background:transparent;width:min(1100px,94vw);max-height:88vh;border-radius:var(--radius)}
+.aud-dialog::backdrop{background:rgba(16,24,40,.45)}
+.aud-body{margin:0;max-height:88vh;overflow:auto;box-shadow:0 12px 40px rgba(16,24,40,.25)}
+.aud-close{margin-left:12px;white-space:nowrap}
+/* Audiencia: botón y tarjetas de insights */
+.aud-btn{font-weight:500;color:var(--muted);white-space:nowrap}
+.aud-btn[aria-pressed=true]{background:#18202F;color:#fff;border-color:#18202F}
+.ins-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px}
+.ins{border:1px solid var(--line);border-radius:12px;padding:14px 16px}
+.ins h3{font-size:14px;margin:0 0 6px;font-weight:600}
+.ins strong{font-weight:600}
+/* Leyenda mapa de calor */
+.legend{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--muted);margin-top:14px}
+.ramp{width:180px;height:10px;border-radius:5px;background:linear-gradient(90deg,#FFF9C4,#FDAE61,#D7191C)}
+/* Temas */
+.cloud{display:flex;flex-wrap:wrap;gap:4px 14px;align-items:center;justify-content:center;min-height:180px;padding:8px 0}
+.topic{border:0;background:transparent;padding:2px 6px;font-weight:600;cursor:pointer;line-height:1.2;border-radius:6px}
+.topic:hover{background:#F4F6F9;text-decoration:underline}
+@media (max-width:960px){.grid-2{grid-template-columns:1fr}.wrap{padding:16px}.topbar{padding:14px 16px}}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;scroll-behavior:auto!important}}
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="brand">
+    <span class="logo" aria-hidden="true">M</span>
+    <div>
+      <h1>Producción editorial</h1>
+      <p class="sub">Meganoticias · Mega · Megatiempo</p>
+    </div>
+  </div>
+  <div class="controls">
+    <div class="tabs" id="tabs" role="group" aria-label="Seleccionar sitio"></div>
+    <button id="audToggle" type="button" class="aud-btn" aria-pressed="false">Audiencia Marfeel</button>
+    <button id="repToggle" type="button" class="aud-btn" aria-pressed="false">Informes</button>
+    <div class="period" role="group" aria-label="Periodo">
+      <label class="field"><span>Periodo</span>
+        <select id="periodMode">
+          <option value="month">Mes</option>
+          <option value="year">Año</option>
+          <option value="range">Rango de fechas</option>
+        </select>
+      </label>
+      <label class="field" id="fldMonth"><span>Mes</span><select id="monthSel"></select></label>
+      <label class="field" id="fldYear" hidden><span>Año</span><select id="yearSel"></select></label>
+      <div class="period" id="fldRange" hidden>
+        <label class="field"><span>Desde</span><input type="date" id="fromDate"></label>
+        <label class="field"><span>Hasta</span><input type="date" id="toDate"></label>
+        <label class="field"><span>Atajo</span>
+          <select id="presetSel">
+            <option value="">Personalizado</option>
+            <option value="7">Últimos 7 días</option>
+            <option value="30">Últimos 30 días</option>
+            <option value="all">Todo el periodo</option>
+          </select>
+        </label>
+      </div>
+    </div>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <p class="ctx" id="ctx"></p>
+
+  <section class="card">
+    <header class="card-h">
+      <h2>Comparativa de portales</h2>
+      <p>Periodo seleccionado. Haz clic en un portal para verlo en detalle.</p>
+    </header>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Portal</th>
+            <th class="num">Editoriales</th>
+            <th class="num">Patrocinadas</th>
+            <th class="num">No publicadas</th>
+            <th class="num">Autores activos</th>
+            <th class="num">Promedio diario</th>
+            <th class="num">Participación editorial</th>
+            <th class="num">Páginas vistas (Marfeel)</th>
+            <th class="num">Usuarios (Marfeel)</th>
+          </tr>
+        </thead>
+        <tbody id="compBody"></tbody>
+      </table>
+    </div>
+    <p class="note">Promedio diario: editoriales publicadas dividido entre los días calendario del periodo.</p>
+    <p class="note" id="mfNote"></p>
+  </section>
+
+  <section class="kpis" id="kpis" aria-label="Tarjetas resumen del sitio seleccionado"></section>
+
+  <section class="grid-2">
+    <article class="card">
+      <header class="card-h">
+        <h2>Publicaciones por día</h2>
+        <p id="dailyNote">Editorial y patrocinado</p>
+      </header>
+      <div class="chart"><canvas id="chartDaily" role="img" aria-label="Publicaciones del sitio"></canvas></div>
+    </article>
+    <article class="card">
+      <header class="card-h">
+        <h2>Publicaciones por sección</h2>
+        <p>Solo editorial</p>
+      </header>
+      <div class="chart"><canvas id="chartSections" role="img" aria-label="Publicaciones por sección"></canvas></div>
+    </article>
+  </section>
+
+  <section class="card">
+    <header class="card-h row">
+      <div>
+        <h2>Mapa de calor: publicación por hora</h2>
+        <p id="hmNote">Publicadas editoriales por día de la semana y hora local.</p>
+      </div>
+      <label class="field"><span>Métrica</span><select id="hmMetric" aria-label="Métrica del mapa de calor"></select></label>
+    </header>
+    <div class="table-wrap">
+      <table class="heat" id="heatTable" aria-label="Mapa de calor por hora"></table>
+    </div>
+    <div class="legend"><span>Menos</span><span class="ramp"></span><span>Más</span></div>
+  </section>
+
+  <section class="card">
+    <header class="card-h">
+      <h2>Insights de horario</h2>
+      <p>Horarios de mayor y menor producción y de audiencia por nota. Son asociaciones descriptivas, no causas. Las franjas con pocas notas no se comparan.</p>
+    </header>
+    <div class="ins-grid" id="hourInsights"></div>
+  </section>
+
+  <section class="card">
+    <header class="card-h row">
+      <div>
+        <h2>Periodistas</h2>
+        <p id="authorsCount" class="muted"></p>
+      </div>
+      <input type="search" id="authorSearch" placeholder="Buscar periodista" aria-label="Buscar periodista">
+    </header>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>#</th>
+            <th data-k="author" tabindex="0">Periodista</th>
+            <th data-k="published" tabindex="0" class="num">Publicadas</th>
+            <th data-k="activeDays" tabindex="0" class="num">Días activos</th>
+            <th data-k="share" tabindex="0" class="num">% del sitio</th>
+            <th data-k="pv" tabindex="0" class="num">Páginas vistas</th>
+            <th data-k="us" tabindex="0" class="num">Usuarios</th>
+            <th data-k="pvNote" tabindex="0" class="num">PV por nota</th>
+            <th data-k="index" tabindex="0" class="num">Índice de audiencia</th>
+            <th data-k="topSection" tabindex="0">Sección principal</th>
+          </tr>
+        </thead>
+        <tbody id="authorsBody"></tbody>
+      </table>
+    </div>
+    <p class="note">Porcentaje calculado sobre publicadas editoriales del sitio en el periodo. Índice de audiencia = participación en páginas vistas ÷ participación en publicadas: 1,00 significa audiencia proporcional a su producción. Los usuarios se suman por URL.</p>
+  </section>
+
+  <dialog id="audienceCard" class="aud-dialog" aria-labelledby="audTitle">
+  <div class="card aud-body">
+    <header class="card-h row">
+      <div>
+        <h2 id="audTitle">Audiencia · Marfeel</h2>
+        <p>Usuarios y páginas vistas de las notas publicadas en el periodo. Cruce por URL normalizada.</p>
+      </div>
+      <div class="q-summary" id="audStatus"></div>
+      <button type="button" id="audClose" class="aud-close">Cerrar</button>
+    </header>
+    <div id="audEmpty" hidden></div>
+    <div id="audContent" hidden>
+      <section class="kpis" id="audKpis" style="margin-bottom:16px"></section>
+      <p class="note" id="audNote" style="margin-top:0;margin-bottom:16px"></p>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Artículo</th><th>Sección</th><th>Hora</th><th class="num">Usuarios</th><th class="num">Páginas vistas</th></tr></thead>
+          <tbody id="audTop"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+  </dialog>
+
+  <section class="card">
+    <header class="card-h">
+      <h2>Temas más utilizados</h2>
+      <p id="topicsNote">Palabras más frecuentes en los títulos publicados. Haz clic en una palabra para filtrar artículos.</p>
+    </header>
+    <div class="cloud" id="cloud"></div>
+  </section>
+  <section class="card" id="articlesCard">
+    <header class="card-h row">
+      <div>
+        <h2>Artículos</h2>
+        <p id="articlesCount" class="muted"></p>
+      </div>
+      <div class="filters">
+        <input type="search" id="articleSearch" placeholder="Título o periodista" aria-label="Buscar artículo">
+        <select id="sectionFilter" aria-label="Filtrar por sección"></select>
+        <select id="fmtFilter" aria-label="Filtrar por formato" hidden></select>
+        <select id="statusFilter" aria-label="Filtrar por estado">
+          <option value="">Todos los estados</option>
+          <option value="editorial">Publicado</option>
+          <option value="sponsored">Patrocinado</option>
+          <option value="unpublished">No publicado</option>
+        </select>
+      </div>
+    </header>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Fecha</th><th>Hora de publicación</th><th>Sección</th><th>Título</th><th>Periodista</th><th>Estado</th><th class="num">Páginas vistas</th><th class="num">Usuarios</th></tr></thead>
+        <tbody id="articlesBody"></tbody>
+      </table>
+    </div>
+    <footer class="pager">
+      <button id="prevPage" type="button">Anterior</button>
+      <span id="pageInfo"></span>
+      <button id="nextPage" type="button">Siguiente</button>
+    </footer>
+  </section>
+  <section class="card" id="qualityCard">
+    <header class="card-h row">
+      <div>
+        <h2>Calidad de datos</h2>
+        <p>Controles sobre el sitio y periodo seleccionados. Usa "Ver casos" para revisar los registros.</p>
+      </div>
+      <div class="q-summary" id="qualitySummary"></div>
+    </header>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Control</th><th class="num">Resultado</th><th>Estado</th><th>Qué significa</th></tr></thead>
+        <tbody id="qualityBody"></tbody>
+      </table>
+    </div>
+  </section>
+
+</main>
+
+<footer style="max-width:1280px;margin:0 auto;padding:0 32px 32px;color:var(--muted);font-size:12px">
+  Datos generados el <span id="genAt"></span>. Horas según el export del CMS.
+</footer>
+
+<dialog id="reportDialog" class="aud-dialog" aria-labelledby="repTitle">
+  <div class="card aud-body">
+    <header class="card-h row">
+      <div>
+        <h2 id="repTitle">Informes</h2>
+        <p id="repSub" class="muted"></p>
+      </div>
+      <button type="button" id="repClose" class="aud-close">Cerrar</button>
+    </header>
+    <div class="tabs rep-tabs" id="repTabs" role="tablist" aria-label="Informes"></div>
+    <div id="repNote"></div>
+    <div id="repBody"></div>
+    <p class="note">Pendientes: vida útil de la nota y tendencia semanal (requieren desglose diario de Marfeel), Score SEO vs. audiencia (requiere el módulo SEO del pipeline) y fuentes de tráfico (requieren GA4).</p>
+  </div>
+</dialog>
+
+<script>
+const DATA_URL = "data/produccion.json";
+
+async function loadData() {
+  const res = await fetch(DATA_URL, { cache: "no-cache" });
+  if (!res.ok) throw new Error(`${DATA_URL}: HTTP ${res.status}`);
+  const j = await res.json();
+  const rows = j.articles.map(a => ({
+    p: a.portal,
+    d: a.published_at.slice(0, 16),
+    s: a.section,
+    f: a.format || "",
+    t: a.title,
+    a: a.author,
+    st: a.status === "published" ? "p" : "u",
+    sp: a.content_type === "sponsored" ? 1 : 0,
+    u: a.url,
+  }));
+  const g = j.meta.generated_at;
+  return {
+    generatedIso: g,
+    generated: `${g.slice(8, 10)}/${g.slice(5, 7)}/${g.slice(0, 4)} ${g.slice(11, 16)}`,
+    portals: j.portals.map(p => ({ id: p.id, name: p.name, color: p.color })),
+    rows,
+  };
+}
+
+function showError(err) {
+  console.error(err);
+  const box = document.createElement("div");
+  box.setAttribute("role", "alert");
+  box.style.cssText = "margin:24px auto;max-width:720px;padding:16px 20px;border-radius:10px;background:#FDECEA;color:#8A1F1A;border:1px solid #F5C6C2;font-family:system-ui,sans-serif";
+  const isFile = location.protocol === "file:";
+  box.textContent = isFile
+    ? "Esta página se abrió como archivo local y el navegador bloquea la lectura de data/produccion.json. Abre produccion_portales.html, que ya incluye los datos, o sirve esta carpeta con un servidor."
+    : "No se pudo cargar data/produccion.json. Verifica que el archivo esté junto a index.html en el servidor. Detalle: " + err.message;
+  document.querySelector("main")?.prepend(box);
+}
+
+(async () => {
+  "use strict";
+  const DATA = await loadData();
+  async function loadMarfeel() {
+    try {
+      const res = await fetch("data/marfeel.json", { cache: "no-cache" });
+      if (!res.ok) return null;
+      const j = await res.json();
+      return Array.isArray(j.rows) ? j : null;
+    } catch (e) {
+      return null;
+    }
+  }
+  DATA.marfeel = await loadMarfeel();
+  const ALL = DATA.rows;
+  const PORTALS = DATA.portals;
+  const PAGE = 50;
+  const MIN_N = 5;
+  const SPONSOR = "#A3ABBA";
+  const DAYS = ["Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado", "Domingo"];
+  const DAYS_S = ["Lun", "Mar", "Mié", "Jue", "Vie", "Sáb", "Dom"];
+  const MONTHS = [...new Set(ALL.map(r => r.d.slice(0, 7)))].sort();
+  const YEARS = [...new Set(ALL.map(r => r.d.slice(0, 4)))].sort();
+  const DATES = ALL.map(r => r.d.slice(0, 10));
+  const MIN_DATE = DATES.reduce((a, b) => (b < a ? b : a));
+  const MAX_DATE = DATES.reduce((a, b) => (b > a ? b : a));
+  const INSTITUTIONAL = new Set(PORTALS.map(p => p.name));
+  const STL = { editorial: "Publicado", sponsored: "Patrocinado", unpublished: "No publicado" };
+  const STOP_RAW = "de la que el en y a los del se las por un para con no una su al lo como mas pero sus le ya o este si porque esta entre cuando muy sin sobre tambien me hasta hay donde quien desde todo nos durante todos uno les ni contra otros ese eso ante ellos esto antes algunos que unos otro otras otra tanto esa estos mucho quienes nada muchos cual poco ella estar estas algunas algo nosotros son fue ser tiene han dos video videos hoy ahora tras segun asi sera fueron";
+
+  const $ = id => document.getElementById(id);
+  const nf = new Intl.NumberFormat("es-CL");
+  const nf1 = new Intl.NumberFormat("es-CL", { maximumFractionDigits: 1 });
+  const nfs = new Intl.NumberFormat("es-CL", { maximumFractionDigits: 1, signDisplay: "always" });
+  const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+  const norm = s => String(s ?? "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+  const STOP = new Set(STOP_RAW.split(" ").map(norm));
+  const SITE_WORDS = new Set(PORTALS.flatMap(p => norm(p.name).split(" ")));
+  const isEd = r => r.st === "p" && !r.sp;
+  const kind = r => r.st === "u" ? "unpublished" : (r.sp ? "sponsored" : "editorial");
+  const hourOf = r => Number(r.d.slice(11, 13));
+  const pad2 = n => String(n).padStart(2, "0");
+
+  const toMs = s => { const [y, m, d] = s.split("-").map(Number); return Date.UTC(y, m - 1, d); };
+  const toYmd = ms => new Date(ms).toISOString().slice(0, 10);
+  const addDays = (s, n) => toYmd(toMs(s) + n * 864e5);
+  const spanDays = (a, b) => Math.round((toMs(b) - toMs(a)) / 864e5) + 1;
+  const dowOf = s => (new Date(toMs(s)).getUTCDay() + 6) % 7;
+  const daysIn = m => { const [y, mo] = m.split("-").map(Number); return new Date(Date.UTC(y, mo, 0)).getUTCDate(); };
+  const monthBounds = m => ({ from: `${m}-01`, to: `${m}-${pad2(daysIn(m))}` });
+  const yearBounds = y => ({ from: `${y}-01-01`, to: `${y}-12-31` });
+  const monthLong = m => {
+    const [y, mo] = m.split("-").map(Number);
+    const s = new Date(Date.UTC(y, mo - 1, 1)).toLocaleDateString("es-CL", { month: "long", year: "numeric", timeZone: "UTC" });
+    return s.charAt(0).toUpperCase() + s.slice(1);
+  };
+  const monthShort = m => {
+    const [y, mo] = m.split("-").map(Number);
+    return new Date(Date.UTC(y, mo - 1, 1)).toLocaleDateString("es-CL", { month: "short", year: "2-digit", timeZone: "UTC" });
+  };
+  const fmtYmd = s => `${s.slice(8, 10)}/${s.slice(5, 7)}/${s.slice(0, 4)}`;
+  const fmtDateTime = d => `${fmtYmd(d)} ${d.slice(11, 16)}`;
+  const inRange = (r, b) => { const d = r.d.slice(0, 10); return d >= b.from && d <= b.to; };
+  const portalOf = id => PORTALS.find(p => p.id === id);
+  const portalRows = (pid, b) => ALL.filter(r => r.p === pid && inRange(r, b));
+
+  const S = {
+    mode: "month", month: MONTHS[MONTHS.length - 1], year: YEARS[YEARS.length - 1],
+    from: MIN_DATE, to: MAX_DATE,
+    portal: PORTALS[0].id, b: null, rows: [],
+    sec: "", fmt: "", kind: "", q: "", page: 1, aq: "",
+    sort: { k: "published", dir: -1 }, charts: {}, hm: "pub", mfOn: false,
+  };
+
+  /* ---------- Periodo ---------- */
+
+  function bounds() {
+    if (S.mode === "month") return monthBounds(S.month);
+    if (S.mode === "year") return yearBounds(S.year);
+    return { from: S.from, to: S.to };
+  }
+
+  function prevBounds(b) {
+    if (S.mode === "month") {
+      const i = MONTHS.indexOf(S.month);
+      return i > 0 ? monthBounds(MONTHS[i - 1]) : null;
+    }
+    if (S.mode === "year") {
+      const y = String(Number(S.year) - 1);
+      return YEARS.includes(y) ? yearBounds(y) : null;
+    }
+    const len = spanDays(b.from, b.to);
+    return { from: addDays(b.from, -len), to: addDays(b.from, -1) };
+  }
+
+  function prevLabel() {
+    if (S.mode === "month") {
+      const i = MONTHS.indexOf(S.month);
+      return i > 0 ? monthLong(MONTHS[i - 1]).toLowerCase() : "";
+    }
+    if (S.mode === "year") return String(Number(S.year) - 1);
+    return "periodo anterior de igual duración";
+  }
+
+  /* Agrupa por día si el periodo tiene hasta 62 días; si no, por mes */
+  function buckets(b) {
+    if (spanDays(b.from, b.to) <= 62) {
+      const keys = [];
+      for (let k = b.from; k <= b.to; k = addDays(k, 1)) keys.push(k);
+      return { mode: "day", keys, labels: keys.map(k => `${k.slice(8, 10)}/${k.slice(5, 7)}`) };
+    }
+    const keys = [];
+    let m = b.from.slice(0, 7);
+    const end = b.to.slice(0, 7);
+    while (m <= end) {
+      keys.push(m);
+      const [y, mo] = m.split("-").map(Number);
+      m = new Date(Date.UTC(y, mo, 1)).toISOString().slice(0, 7);
+    }
+    return { mode: "month", keys, labels: keys.map(monthShort) };
+  }
+
+  function bucketCounts(rows, b, pred) {
+    const bk = buckets(b);
+    const idx = new Map(bk.keys.map((k, i) => [k, i]));
+    const data = new Array(bk.keys.length).fill(0);
+    for (const r of rows) {
+      if (!pred(r)) continue;
+      const i = idx.get(bk.mode === "day" ? r.d.slice(0, 10) : r.d.slice(0, 7));
+      if (i !== undefined) data[i]++;
+    }
+    return { labels: bk.labels, data };
+  }
+
+  function stats(rows, b) {
+    const ed = rows.filter(isEd);
+    return {
+      editorial: ed.length,
+      sponsored: rows.filter(r => r.st === "p" && r.sp).length,
+      unpublished: rows.filter(r => r.st === "u").length,
+      authors: new Set(ed.map(r => r.a)).size,
+      avg: ed.length / spanDays(b.from, b.to),
+    };
+  }
+
+  function drawChart(key, id, cfg) {
+    if (S.charts[key]) S.charts[key].destroy();
+    S.charts[key] = new Chart($(id), cfg);
+  }
+
+  /* ---------- Barra superior y contexto ---------- */
+
+  function renderHeader() {
+    $("tabs").innerHTML = PORTALS.map(p =>
+      `<button type="button" data-p="${p.id}" aria-pressed="${p.id === S.portal}">` +
+      `<span class="dot" style="background:${p.color}"></span>${esc(p.name)}</button>`).join("");
+    $("periodMode").value = S.mode;
+    $("fldMonth").hidden = S.mode !== "month";
+    $("fldYear").hidden = S.mode !== "year";
+    $("fldRange").hidden = S.mode !== "range";
+    $("monthSel").value = S.month;
+    $("yearSel").value = S.year;
+    $("fromDate").value = S.from;
+    $("toDate").value = S.to;
+    const n = spanDays(S.b.from, S.b.to);
+    $("ctx").textContent = `${portalOf(S.portal).name} · ${fmtYmd(S.b.from)} – ${fmtYmd(S.b.to)} · ${nf.format(n)} días`;
+  }
+
+  /* ---------- Comparativa ---------- */
+
+  function renderComparison() {
+    const data = PORTALS.map(p => ({ p, s: stats(portalRows(p.id, S.b), S.b) }));
+    const totalEd = data.reduce((a, d) => a + d.s.editorial, 0);
+    const on = mfCovers(S.b);
+    $("compBody").innerHTML = data.map(({ p, s }) => {
+      const t = on ? mfPortalTotals(p.id) : null;
+      return `
+      <tr data-p="${p.id}" class="${p.id === S.portal ? "selected" : ""}">
+        <td><span class="pname"><span class="dot" style="background:${p.color}"></span>${esc(p.name)}</span></td>
+        <td class="num">${nf.format(s.editorial)}</td>
+        <td class="num">${nf.format(s.sponsored)}</td>
+        <td class="num">${nf.format(s.unpublished)}</td>
+        <td class="num">${nf.format(s.authors)}</td>
+        <td class="num">${nf1.format(s.avg)}</td>
+        <td class="num">${nf1.format(totalEd ? s.editorial / totalEd * 100 : 0)} %</td>
+        <td class="num">${t ? nf.format(t.pv) : "—"}</td>
+        <td class="num">${t ? nf.format(t.us) : "—"}</td>
+      </tr>`;
+    }).join("");
+    $("mfNote").textContent = mfNote(S.b);
+  }
+
+  /* ---------- Tarjetas resumen ---------- */
+
+  function renderKPIs() {
+    const cur = stats(S.rows, S.b);
+    const pb = prevBounds(S.b);
+    const prevRows = pb ? portalRows(S.portal, pb) : [];
+    const prev = pb && prevRows.length ? stats(prevRows, pb) : null;
+    const items = [
+      { label: "Publicadas editoriales", k: "editorial", f: nf },
+      { label: "Patrocinadas publicadas", k: "sponsored", f: nf },
+      { label: "No publicadas", k: "unpublished", f: nf },
+      { label: "Autores activos", k: "authors", f: nf },
+      { label: "Promedio diario editorial", k: "avg", f: nf1 },
+    ];
+    $("kpis").innerHTML = items.map(it => {
+      const v = cur[it.k];
+      let delta = `<span class="delta">Sin base de comparación</span>`;
+      if (prev && prev[it.k]) {
+        const pct = (v - prev[it.k]) / prev[it.k] * 100;
+        delta = `<span class="delta ${pct >= 0 ? "up" : "down"}">${nfs.format(pct)} % vs. ${esc(prevLabel())}</span>`;
+      }
+      return `<article class="kpi"><p class="kpi-label">${it.label}</p><p class="kpi-value">${it.f.format(v)}</p>${delta}</article>`;
+    }).join("");
+  }
+
+  /* ---------- Gráficos del sitio ---------- */
+
+  function renderDaily() {
+    const p = portalOf(S.portal);
+    const ed = bucketCounts(S.rows, S.b, isEd);
+    const sp = bucketCounts(S.rows, S.b, r => r.st === "p" && r.sp);
+    $("dailyNote").textContent = `Editorial y patrocinado · ${buckets(S.b).mode === "day" ? "por día" : "por mes"}`;
+    drawChart("daily", "chartDaily", {
+      type: "bar",
+      data: {
+        labels: ed.labels,
+        datasets: [
+          { label: "Editorial", data: ed.data, backgroundColor: p.color, borderRadius: 4, stack: "s" },
+          { label: "Patrocinado", data: sp.data, backgroundColor: SPONSOR, borderRadius: 4, stack: "s" },
+        ],
+      },
+      options: {
+        responsive: true, maintainAspectRatio: false,
+        plugins: { legend: { position: "bottom", labels: { boxWidth: 10, usePointStyle: true } } },
+        scales: { x: { stacked: true, grid: { display: false } }, y: { stacked: true, beginAtZero: true } },
+      },
+    });
+  }
+
+  function renderSections() {
+    const p = portalOf(S.portal);
+    const counts = {};
+    for (const r of S.rows.filter(isEd)) counts[r.s] = (counts[r.s] || 0) + 1;
+    const entries = Object.entries(counts).sort((a, b) => b[1] - a[1]);
+    drawChart("sections", "chartSections", {
+      type: "bar",
+      data: { labels: entries.map(e => e[0]), datasets: [{ data: entries.map(e => e[1]), backgroundColor: p.color, borderRadius: 4 }] },
+      options: {
+        indexAxis: "y", responsive: true, maintainAspectRatio: false,
+        plugins: { legend: { display: false } },
+        scales: { x: { beginAtZero: true }, y: { grid: { display: false } } },
+      },
+    });
+  }
+
+  /* ---------- Mapa de calor por hora ---------- */
+
+  const HEAT_STOPS = [[0, [255, 249, 196]], [0.5, [253, 174, 97]], [1, [215, 25, 28]]];
+  function heatColor(t) {
+    for (let i = 1; i < HEAT_STOPS.length; i++) {
+      const [t0, c0] = HEAT_STOPS[i - 1], [t1, c1] = HEAT_STOPS[i];
+      if (t <= t1) {
+        const k = (t - t0) / (t1 - t0);
+        return `rgb(${c0.map((v, j) => Math.round(v + (c1[j] - v) * k)).join(",")})`;
+      }
+    }
+    return "rgb(215,25,28)";
+  }
+  const HM_METRICS = { pub: "Publicaciones", pv: "Páginas vistas (total)", us: "Usuarios (total)", pvAvg: "Páginas vistas por nota" };
+  const HM_NEEDS_MF = { pv: true, us: true, pvAvg: true };
+  const HM_DESC = {
+    pub: "Publicadas editoriales por día de la semana y hora local.",
+    pv: "Páginas vistas de las notas publicadas en cada franja, según Marfeel.",
+    us: "Usuarios por URL de las notas publicadas en cada franja. Se suman por URL.",
+    pvAvg: "Páginas vistas promedio por nota publicada en cada franja. Las notas de fin de mes tuvieron menos días para acumular visitas.",
+  };
+  const nfc = new Intl.NumberFormat("es-CL", { notation: "compact", maximumFractionDigits: 1 });
+  const grid7 = () => Array.from({ length: 7 }, () => new Array(24).fill(0));
+
+  function hourGrid(rows) {
+    const g = { n: grid7(), m: grid7(), pv: grid7(), us: grid7() };
+    for (const r of rows) {
+      if (!isEd(r)) continue;
+      const d = dowOf(r.d.slice(0, 10)), h = hourOf(r);
+      g.n[d][h]++;
+      if (r.mpv != null) { g.m[d][h]++; g.pv[d][h] += r.mpv; g.us[d][h] += r.mus; }
+    }
+    return g;
+  }
+
+  function metricValues(g, metric) {
+    if (metric === "pv") return g.pv;
+    if (metric === "us") return g.us;
+    if (metric === "pvAvg") return g.m.map((row, d) => row.map((c, h) => (c ? g.pv[d][h] / c : 0)));
+    return g.n;
+  }
+
+  function renderHeatmap() {
+    if (HM_NEEDS_MF[S.hm] && !S.mfOn) S.hm = "pub";
+    $("hmMetric").innerHTML = Object.entries(HM_METRICS).map(([k, v]) =>
+      `<option value="${k}"${HM_NEEDS_MF[k] && !S.mfOn ? " disabled" : ""}>${v}</option>`).join("");
+    $("hmMetric").value = S.hm;
+    $("hmNote").textContent = HM_NEEDS_MF[S.hm] && !S.mfOn
+      ? "Esta métrica requiere datos de Marfeel del periodo completo."
+      : HM_DESC[S.hm];
+
+    const g = hourGrid(S.rows);
+    const vals = metricValues(g, S.hm);
+    const max = Math.max(1, ...vals.flat());
+    const fmt = v => (S.hm === "pub" ? nf.format(v) : nfc.format(v));
+
+    let html = `<thead><tr><th></th>` +
+      Array.from({ length: 24 }, (_, h) => `<th class="hcol" scope="col">${pad2(h)}</th>`).join("") +
+      `<th class="num" scope="col">Total</th></tr></thead><tbody>`;
+    vals.forEach((row, d) => {
+      html += `<tr><th scope="row" class="hday">${DAYS_S[d]}</th>`;
+      row.forEach((v, h) => {
+        const txt = v ? fmt(v) : "";
+        html += `<td class="hm" style="background:${heatColor(v / max)};color:${v / max > 0.6 ? "#fff" : "var(--text)"}" ` +
+          `title="${DAYS[d]} ${pad2(h)}:00 · ${fmt(v)} (${HM_METRICS[S.hm]})">${txt}</td>`;
+      });
+      const sum = row.reduce((x, y) => x + y, 0);
+      html += `<td class="num">${S.hm === "pvAvg" ? "—" : fmt(sum)}</td></tr>`;
+    });
+    $("heatTable").innerHTML = html + `</tbody>`;
+    renderHourInsights(g);
+  }
+
+  function renderHourInsights(g) {
+    const hn = new Array(24).fill(0), hm = new Array(24).fill(0), hpv = new Array(24).fill(0);
+    for (let d = 0; d < 7; d++) for (let h = 0; h < 24; h++) {
+      hn[h] += g.n[d][h]; hm[h] += g.m[d][h]; hpv[h] += g.pv[d][h];
+    }
+    const avg = hm.map((c, h) => (c ? hpv[h] / c : null));
+    const hourLabel = h => `${pad2(h)}:00`;
+    const quant = (arr, p) => (arr.length ? arr[Math.floor(p * (arr.length - 1))] : null);
+    const box = (title, items, empty) => `<div class="ins"><h3>${title}</h3>` +
+      (items.length ? `<ul class="q-list">${items.map(x => `<li>${x}</li>`).join("")}</ul>`
+                    : `<p class="muted" style="margin:0;font-size:13px">${empty}</p>`) + `</div>`;
+
+    const hours = [...Array(24).keys()];
+    const byProd = hours.slice().sort((a, b) => hn[b] - hn[a] || a - b);
+    const prodTop = byProd.slice(0, 3).map(h => `<strong>${hourLabel(h)}</strong> · ${nf.format(hn[h])} publicadas`);
+    const prodLow = byProd.slice().reverse().slice(0, 3).map(h =>
+      `<strong>${hourLabel(h)}</strong> · ${hn[h] ? nf.format(hn[h]) + " publicadas" : "sin publicaciones"}`);
+    const blocks = [
+      box("Horarios con más producción", prodTop, "Sin publicaciones en el periodo."),
+      box("Horarios con menos producción", prodLow, "Sin publicaciones en el periodo."),
+    ];
+
+    if (!S.mfOn) {
+      blocks.push(box("Audiencia por hora", [], "Activa Audiencia Marfeel en un periodo completo para ver insights de audiencia."));
+      $("hourInsights").innerHTML = blocks.join("");
+      return;
+    }
+
+    const rated = hours.filter(h => hm[h] >= MIN_N && avg[h] !== null);
+    const byAud = rated.slice().sort((a, b) => avg[b] - avg[a]);
+    const audTop = byAud.slice(0, 3).map(h => `<strong>${hourLabel(h)}</strong> · ${nf.format(Math.round(avg[h]))} PV por nota (${hm[h]} notas)`);
+    const audLow = byAud.slice().reverse().slice(0, 3).map(h => `<strong>${hourLabel(h)}</strong> · ${nf.format(Math.round(avg[h]))} PV por nota (${hm[h]} notas)`);
+    const insufficient = `Muestra insuficiente: se requieren al menos ${MIN_N} notas por franja.`;
+    blocks.push(box("Mejores horarios de audiencia", audTop, insufficient));
+    blocks.push(box("Peores horarios de audiencia", audLow, insufficient));
+
+    const prodVals = hours.filter(h => hn[h] > 0).map(h => hn[h]).sort((a, b) => a - b);
+    const p25 = quant(prodVals, 0.25), p75 = quant(prodVals, 0.75);
+    const audVals = rated.map(h => avg[h]).sort((a, b) => a - b);
+    const med = quant(audVals, 0.5);
+    const over = rated.filter(h => hn[h] >= p75 && avg[h] < med)
+      .map(h => `<strong>${hourLabel(h)}</strong> · ${nf.format(hn[h])} publicadas, ${nf.format(Math.round(avg[h]))} PV por nota`);
+    const under = rated.filter(h => hn[h] > 0 && hn[h] <= p25 && avg[h] > med)
+      .map(h => `<strong>${hourLabel(h)}</strong> · ${nf.format(hn[h])} publicadas, ${nf.format(Math.round(avg[h]))} PV por nota`);
+    blocks.push(box("Revisar: mucha producción, audiencia por nota baja", over,
+      "Ninguna franja cumple el criterio (alta producción y audiencia bajo la mediana)."));
+    blocks.push(box("Oportunidad: poca producción, audiencia por nota alta", under,
+      "Ninguna franja cumple el criterio (baja producción y audiencia sobre la mediana)."));
+
+    const combos = [];
+    for (let d = 0; d < 7; d++) for (let h = 0; h < 24; h++) {
+      if (g.m[d][h] >= MIN_N) combos.push({ d, h, avg: g.pv[d][h] / g.m[d][h], m: g.m[d][h] });
+    }
+    combos.sort((a, b) => b.avg - a.avg);
+    const comboItems = combos.slice(0, 5).map(c =>
+      `<strong>${DAYS[c.d]} ${hourLabel(c.h)}</strong> · ${nf.format(Math.round(c.avg))} PV por nota (${c.m} notas)`);
+    blocks.push(box("Mejores franjas día y hora", comboItems, insufficient));
+
+    $("hourInsights").innerHTML = blocks.join("");
+  }
+
+  /* ---------- Temas en títulos ---------- */
+
+  function renderTopics() {
+    const map = new Map();
+    for (const r of S.rows.filter(isEd)) {
+      const seen = new Set();
+      for (const tok of r.t.toLowerCase().match(/[\p{L}\p{N}]+/gu) || []) {
+        if (tok.length < 4 || /^\d+$/.test(tok)) continue;
+        const k = norm(tok);
+        if (STOP.has(k) || SITE_WORDS.has(k) || seen.has(k)) continue;
+        seen.add(k);
+        const cur = map.get(k);
+        if (cur) cur.count++;
+        else map.set(k, { count: 1, word: tok });
+      }
+    }
+    const top = [...map.values()].sort((a, b) => b.count - a.count).slice(0, 40);
+    const p = portalOf(S.portal);
+    if (!top.length) {
+      $("cloud").innerHTML = `<p class="empty">Sin títulos suficientes en este periodo</p>`;
+      return;
+    }
+    const maxC = top[0].count, minC = top[top.length - 1].count;
+    $("cloud").innerHTML = top.map(t => {
+      const size = 13 + (t.count - minC) / (maxC - minC || 1) * 17;
+      return `<button type="button" class="topic" data-w="${esc(t.word)}" style="font-size:${size.toFixed(1)}px;color:${p.color}" ` +
+        `title="${nf.format(t.count)} títulos">${esc(t.word)}</button>`;
+    }).join("");
+    $("topicsNote").textContent = `Palabras más frecuentes en ${nf.format(S.rows.filter(isEd).length)} títulos publicados. Haz clic en una palabra para filtrar artículos.`;
+  }
+
+  /* ---------- Filtros y periodistas ---------- */
+
+  function renderFilters() {
+    const secs = [...new Set(S.rows.map(r => r.s))].sort((a, b) => a.localeCompare(b, "es"));
+    if (!secs.includes(S.sec)) S.sec = "";
+    $("sectionFilter").innerHTML = `<option value="">Todas las secciones</option>` +
+      secs.map(s => `<option value="${esc(s)}">${esc(s)}</option>`).join("");
+    $("sectionFilter").value = S.sec;
+
+    const fmts = [...new Set(S.rows.map(r => r.f).filter(Boolean))].sort((a, b) => a.localeCompare(b, "es"));
+    if (!fmts.includes(S.fmt)) S.fmt = "";
+    $("fmtFilter").hidden = fmts.length === 0;
+    $("fmtFilter").innerHTML = `<option value="">Todos los formatos</option>` +
+      fmts.map(f => `<option value="${esc(f)}">${esc(f)}</option>`).join("");
+    $("fmtFilter").value = S.fmt;
+  }
+
+  function authorRows() {
+    const ed = S.rows.filter(isEd);
+    const total = ed.length;
+    const on = S.mfOn;
+    const totalPv = on ? ed.reduce((a, r) => a + (r.mpv || 0), 0) : 0;
+    const map = new Map();
+    for (const r of ed) {
+      if (!map.has(r.a)) map.set(r.a, { author: r.a, published: 0, days: new Set(), sec: {}, pv: 0, us: 0, matched: 0 });
+      const o = map.get(r.a);
+      o.published++;
+      o.days.add(r.d.slice(0, 10));
+      o.sec[r.s] = (o.sec[r.s] || 0) + 1;
+      if (r.mpv != null) { o.pv += r.mpv; o.us += r.mus; o.matched++; }
+    }
+    return [...map.values()].map(o => {
+      const top = Object.entries(o.sec).sort((a, b) => b[1] - a[1])[0];
+      const share = total ? o.published / total * 100 : 0;
+      const pvShare = on && totalPv ? o.pv / totalPv * 100 : null;
+      return {
+        author: o.author,
+        published: o.published,
+        activeDays: o.days.size,
+        share,
+        pv: on ? o.pv : null,
+        us: on ? o.us : null,
+        pvNote: on && o.matched ? o.pv / o.matched : null,
+        index: pvShare !== null && share > 0 && o.matched ? pvShare / share : null,
+        topSection: top ? top[0] : "—",
+        institutional: INSTITUTIONAL.has(o.author),
+      };
+    });
+  }
+
+  function renderAuthors() {
+    let rows = authorRows();
+    const q = norm(S.aq);
+    if (q) rows = rows.filter(r => norm(r.author).includes(q));
+    const { k, dir } = S.sort;
+    rows.sort((a, b) => {
+      if (k === "author" || k === "topSection") return a[k].localeCompare(b[k], "es") * dir;
+      const va = a[k] == null ? -Infinity : a[k];
+      const vb = b[k] == null ? -Infinity : b[k];
+      return va === vb ? 0 : (va < vb ? -1 : 1) * dir;
+    });
+    const v = (x, fn) => (x == null ? "—" : fn(x));
+    $("authorsBody").innerHTML = rows.length ? rows.map((r, i) => `
+      <tr>
+        <td class="num">${i + 1}</td>
+        <td>${esc(r.author)}${r.institutional ? '<span class="tag">institucional</span>' : ""}</td>
+        <td class="num">${nf.format(r.published)}</td>
+        <td class="num">${nf.format(r.activeDays)}</td>
+        <td class="num">${nf1.format(r.share)} %</td>
+        <td class="num">${v(r.pv, x => nf.format(x))}</td>
+        <td class="num">${v(r.us, x => nf.format(x))}</td>
+        <td class="num">${v(r.pvNote, x => nf.format(Math.round(x)))}</td>
+        <td class="num">${v(r.index, x => nf2.format(x))}</td>
+        <td>${esc(r.topSection)}</td>
+      </tr>`).join("") : `<tr><td colspan="10" class="empty">Sin periodistas con esos criterios</td></tr>`;
+    $("authorsCount").textContent = `${nf.format(rows.length)} periodistas`;
+    document.querySelectorAll("th[data-k]").forEach(th => th.setAttribute("aria-sort",
+      th.dataset.k === k ? (dir === 1 ? "ascending" : "descending") : "none"));
+  }
+
+  function sortAuthors(k) {
+    if (S.sort.k === k) S.sort.dir *= -1;
+    else S.sort = { k, dir: (k === "author" || k === "topSection") ? 1 : -1 };
+    renderAuthors();
+  }
+
+  /* ---------- Artículos ---------- */
+
+  function filtered() {
+    const q = norm(S.q);
+    return S.rows.filter(r =>
+      (!S.sec || r.s === S.sec) &&
+      (!S.fmt || r.f === S.fmt) &&
+      (!S.kind || kind(r) === S.kind) &&
+      (!q || norm(r.t).includes(q) || norm(r.a).includes(q)));
+  }
+
+  function renderArticles() {
+    const rows = filtered();
+    const pages = Math.max(1, Math.ceil(rows.length / PAGE));
+    S.page = Math.min(S.page, pages);
+    const slice = rows.slice((S.page - 1) * PAGE, S.page * PAGE);
+    $("articlesBody").innerHTML = slice.length ? slice.map(r => {
+      const k = kind(r);
+      const hit = r.st === "p" && r.mpv != null;
+      return `<tr>
+        <td class="nowrap">${fmtYmd(r.d)}</td>
+        <td class="hour">${r.d.slice(11, 16)}</td>
+        <td><span class="chip">${esc(r.s)}</span>${r.f ? ` <span class="muted fmt">${esc(r.f)}</span>` : ""}</td>
+        <td class="title"><a href="${esc(r.u)}" target="_blank" rel="noopener">${esc(r.t)}</a></td>
+        <td>${esc(r.a)}</td>
+        <td><span class="status s-${k}">${STL[k]}</span></td>
+        <td class="num">${hit ? nf.format(r.mpv) : "—"}</td>
+        <td class="num">${hit ? nf.format(r.mus) : "—"}</td>
+      </tr>`;
+    }).join("") : `<tr><td colspan="8" class="empty">Sin artículos con esos filtros</td></tr>`;
+    $("articlesCount").textContent = `${nf.format(rows.length)} artículos`;
+    $("pageInfo").textContent = `Página ${S.page} de ${pages}`;
+    $("prevPage").disabled = S.page <= 1;
+    $("nextPage").disabled = S.page >= pages;
+  }
+
+  /* ---------- Audiencia · Marfeel ---------- */
+
+  // Clave de cruce: host sin "www", ruta sin barra final, sin protocolo, query ni fragmento.
+  const normUrl = u => {
+    try {
+      const x = new URL(String(u).trim());
+      const host = x.hostname.replace(/^www\./, "").toLowerCase();
+      const path = x.pathname.replace(/\/+$/, "") || "/";
+      return host + path.toLowerCase();
+    } catch (e) {
+      return String(u).trim().toLowerCase();
+    }
+  };
+  const kpiCard = (label, value) =>
+    `<article class="kpi"><p class="kpi-label">${label}</p><p class="kpi-value">${value}</p></article>`;
+  const nf2 = new Intl.NumberFormat("es-CL", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
+  // Índice por portal + URL normalizada, con totales del periodo de Marfeel.
+  const MF = { index: null };
+  function mfIndex() {
+    if (!MF.index) {
+      MF.index = new Map();
+      for (const r of (DATA.marfeel && DATA.marfeel.rows) || []) {
+        const k = r.portal + "|" + normUrl(r.url);
+        const o = MF.index.get(k) || { pageviews: 0, users: 0 };
+        o.pageviews += Number(r.pageviews) || 0;
+        o.users += Number(r.users) || 0;
+        MF.index.set(k, o);
+      }
+    }
+    return MF.index;
+  }
+
+  // Marfeel entrega totales del periodo completo: solo se usan si el periodo seleccionado lo incluye.
+  function mfCovers(b) {
+    const m = DATA.marfeel;
+    const per = m && m.meta && m.meta.period;
+    return !!(per && m.rows.length && b.from <= per.from && b.to >= per.to);
+  }
+  function mfNote(b) {
+    const m = DATA.marfeel;
+    const per = m && m.meta && m.meta.period;
+    if (!m || !m.rows.length || !per) return "Sin datos de Marfeel cargados.";
+    if (mfCovers(b)) return "";
+    return `Marfeel entrega totales de ${fmtYmd(per.from)} – ${fmtYmd(per.to)}. Selecciona un periodo que incluya todo ese rango para ver páginas vistas y usuarios.`;
+  }
+
+  // Asigna a cada fila del periodo sus métricas de Marfeel (o null).
+  function mfEnrich() {
+    const on = mfCovers(S.b);
+    const idx = mfIndex();
+    for (const r of S.rows) {
+      const h = on ? idx.get(r.p + "|" + normUrl(r.u)) : null;
+      r.mpv = h ? h.pageviews : null;
+      r.mus = h ? h.users : null;
+    }
+    S.mfOn = on;
+  }
+
+  // Totales de Marfeel por portal (todas sus URLs en el periodo).
+  function mfPortalTotals(pid) {
+    let pv = 0, us = 0;
+    for (const r of (DATA.marfeel && DATA.marfeel.rows) || []) {
+      if (r.portal === pid) { pv += Number(r.pageviews) || 0; us += Number(r.users) || 0; }
+    }
+    return { pv, us };
+  }
+
+  // Asigna a cada fila del periodo sus métricas de Marfeel (o null).
+  function mfEnrich() {
+    const on = mfCovers(S.b);
+    const idx = mfIndex();
+    for (const r of S.rows) {
+      const h = on ? idx.get(r.p + "|" + normUrl(r.u)) : null;
+      r.mpv = h ? h.pageviews : null;
+      r.mus = h ? h.users : null;
+    }
+    S.mfOn = on;
+  }
+
+  function renderAudience() {
+    const m = DATA.marfeel;
+    const ok = S.mfOn;
+    $("audStatus").innerHTML = ok
+      ? `<span class="q-chip q-ok">Datos de Marfeel cargados</span>`
+      : `<span class="q-chip q-info">${m && m.rows.length ? "Periodo fuera de cobertura" : "Sin datos de Marfeel"}</span>`;
+    $("audEmpty").hidden = ok;
+    $("audContent").hidden = !ok;
+    $("audEmpty").innerHTML = `<p class="muted" style="margin:0">${esc(mfNote(S.b)) || "Sin datos disponibles para este periodo."}</p>`;
+    if (!ok) return;
+
+    const pid = S.portal;
+    const ed = S.rows.filter(isEd);
+    const withM = ed.filter(r => r.mpv !== null);
+    const mPv = withM.reduce((x, r) => x + r.mpv, 0);
+    const mUs = withM.reduce((x, r) => x + r.mus, 0);
+
+    // URLs de Marfeel del portal que no están en el reporte de producción
+    const prodKeys = new Set(ALL.filter(r => r.p === pid).map(r => normUrl(r.u)));
+    let unUs = 0, unPv = 0;
+    for (const r of (m.rows || [])) {
+      if (r.portal === pid && !prodKeys.has(normUrl(r.url))) { unUs += Number(r.users) || 0; unPv += Number(r.pageviews) || 0; }
+    }
+
+    $("audKpis").innerHTML = [
+      kpiCard("Usuarios en artículos (suma por URL)", nf.format(mUs)),
+      kpiCard("Páginas vistas en artículos", nf.format(mPv)),
+      kpiCard("Cobertura de publicadas", `${nf1.format(ed.length ? withM.length / ed.length * 100 : 0)} %`),
+      kpiCard("Usuarios por artículo", nf1.format(withM.length ? mUs / withM.length : 0)),
+      kpiCard("Sin cruce con producción", nf.format(unUs)),
+    ].join("");
+    $("audNote").textContent = `Marfeel entrega totales por URL para ${fmtYmd(m.meta.period.from)} – ${fmtYmd(m.meta.period.to)}, sin desglose diario. Los usuarios se suman por URL y no equivalen a usuarios únicos del sitio. Sin cruce: ${nf.format(unPv)} páginas vistas en URLs que no están en el reporte de producción.`;
+
+    const top = withM.slice().sort((x, y) => y.mus - x.mus).slice(0, 15);
+    $("audTop").innerHTML = top.length
+      ? top.map(r => `<tr>
+          <td class="title"><a href="${esc(r.u)}" target="_blank" rel="noopener">${esc(r.t)}</a></td>
+          <td><span class="chip">${esc(r.s)}</span></td>
+          <td class="hour">${r.d.slice(11, 16)}</td>
+          <td class="num">${nf.format(r.mus)}</td>
+          <td class="num">${nf.format(r.mpv)}</td></tr>`).join("")
+      : `<tr><td colspan="5" class="empty">Ningún artículo del periodo tiene datos de Marfeel</td></tr>`;
+  }
+
+  /* ---------- Calidad de datos ---------- */
+
+  const QUALITY_TXT = { ok: "Correcto", warn: "Atención", crit: "Crítico", info: "Informativo" };
+  const urlDate = u => { const m = String(u).match(/(\d{2})-(\d{2})-(\d{4})/); return m ? `${m[3]}-${m[2]}-${m[1]}` : null; };
+  const nowLocal = () => new Date().toLocaleString("sv-SE", { timeZone: "America/Santiago" }).replace(" ", "T").slice(0, 16);
+  const caseOf = r => ({ t: r.t, meta: `${fmtDateTime(r.d)} · ${r.s}`, u: r.u });
+
+  function qualityChecks(rows, b) {
+    const total = rows.length;
+    const out = [];
+    const add = c => out.push({ examples: [], result: `${nf.format(c.count)} de ${nf.format(c.total)}`, ...c });
+
+    // 1. Títulos repetidos en URLs distintas
+    const groups = new Map();
+    for (const r of rows) {
+      const k = norm(r.t).trim();
+      if (!groups.has(k)) groups.set(k, []);
+      groups.get(k).push(r);
+    }
+    const dup = [...groups.values()].filter(g => g.length > 1 && new Set(g.map(x => x.u)).size > 1);
+    const dupCount = dup.reduce((a, g) => a + g.length, 0);
+    add({
+      label: "Títulos repetidos en URLs distintas", count: dupCount, total,
+      status: dupCount === 0 ? "ok" : dupCount / total > 0.02 ? "crit" : "warn",
+      desc: "Pueden ser duplicados de carga o titulares recurrentes. Conviene revisarlos antes de contarlos como producción nueva.",
+      examples: dup.slice(0, 25).map(g => ({
+        t: g[0].t,
+        meta: `${g.length} registros · ${[...new Set(g.map(x => fmtYmd(x.d)))].join(", ")}`,
+        u: g[0].u,
+      })),
+    });
+
+    // 2. Fecha en la URL distinta a la fecha de publicación
+    const dated = rows.filter(r => urlDate(r.u));
+    const mism = dated.filter(r => urlDate(r.u) !== r.d.slice(0, 10));
+    add({
+      label: "Fecha en la URL distinta a la de publicación", count: mism.length, total: dated.length,
+      status: mism.length === 0 ? "ok" : "warn",
+      desc: "Algunos formatos (por ejemplo, Dato útil) llevan la fecha del día anterior. Hay que definir cuál fecha es la canónica.",
+      examples: mism.slice(0, 25).map(r => ({
+        t: r.t, meta: `Publicada ${fmtDateTime(r.d)} · URL ${fmtYmd(urlDate(r.u))}`, u: r.u,
+      })),
+    });
+
+    // 3. Artículos sin periodista
+    const noAuthor = rows.filter(r => !r.a || r.a === "—");
+    add({
+      label: "Artículos sin periodista", count: noAuthor.length, total,
+      status: noAuthor.length ? "crit" : "ok",
+      desc: "Sin firma no se puede atribuir la producción. Hay que revisar el campo en el CMS.",
+      examples: noAuthor.slice(0, 25).map(caseOf),
+    });
+
+    // 4. Firmas institucionales
+    const inst = rows.filter(r => INSTITUTIONAL.has(r.a));
+    add({
+      label: "Firmas institucionales", count: inst.length, total,
+      status: inst.length ? "info" : "ok",
+      desc: "Notas firmadas con el nombre del portal. Aparecen marcadas en la tabla de periodistas.",
+      examples: inst.slice(0, 25).map(caseOf),
+    });
+
+    // 5. Patrocinados publicados
+    const spPub = rows.filter(r => r.st === "p" && r.sp);
+    add({
+      label: "Patrocinados publicados", count: spPub.length, total,
+      status: spPub.length ? "info" : "ok",
+      desc: "Quedan fuera de las métricas editoriales y tienen su propia tarjeta.",
+    });
+
+    // 6. Caracteres de escape en títulos
+    const escaped = rows.filter(r => /\\/.test(r.t));
+    add({
+      label: "Títulos con caracteres de escape", count: escaped.length, total,
+      status: escaped.length ? "crit" : "ok",
+      desc: "Barras invertidas residuales en el título, por ejemplo en comillas o apóstrofes. Deben limpiarse en la ingesta.",
+      examples: escaped.slice(0, 25).map(caseOf),
+    });
+
+    // 7. Títulos muy cortos
+    const short = rows.filter(r => r.t.trim().length < 15);
+    add({
+      label: "Títulos muy cortos (menos de 15 caracteres)", count: short.length, total,
+      status: short.length ? "warn" : "ok",
+      desc: "Pueden ser errores de carga o titulares incompletos.",
+      examples: short.slice(0, 25).map(caseOf),
+    });
+
+    // 8. Tasa de no publicadas
+    const un = rows.filter(r => r.st === "u");
+    const unRate = total ? un.length / total : 0;
+    add({
+      label: "Tasa de no publicadas", count: un.length, total,
+      result: `${nf1.format(unRate * 100)} %`,
+      status: unRate > 0.15 ? "crit" : unRate > 0.05 ? "warn" : "ok",
+      desc: "Porcentaje de piezas no publicadas sobre el total del periodo. Atención desde 5 %, crítico desde 15 %.",
+    });
+
+    // 9. Fechas posteriores a hoy
+    const now = nowLocal();
+    const future = rows.filter(r => r.d > now);
+    add({
+      label: "Fechas posteriores a hoy", count: future.length, total,
+      status: future.length ? "crit" : "ok",
+      desc: "Fechas de publicación en el futuro. Suelen indicar error de zona horaria o de carga.",
+      examples: future.slice(0, 25).map(caseOf),
+    });
+
+    // 10. Días sin publicaciones editoriales
+    const edDays = new Set(rows.filter(isEd).map(r => r.d.slice(0, 10)));
+    const missing = [];
+    for (let d = b.from; d <= b.to; d = addDays(d, 1)) if (!edDays.has(d)) missing.push(d);
+    const days = spanDays(b.from, b.to);
+    add({
+      label: "Días sin publicaciones editoriales", count: missing.length, total: days,
+      status: missing.length === 0 ? "ok" : missing.length / days > 0.1 ? "warn" : "info",
+      desc: "Días del periodo sin piezas editoriales. Puede ser normal en fines de semana o indicar un hueco de carga.",
+      examples: missing.slice(0, 25).map(d => ({ t: fmtYmd(d), meta: "Sin publicaciones editoriales", u: "" })),
+    });
+
+    // 11. Antigüedad de la última carga
+    const ageH = (Date.now() - Date.parse(DATA.generatedIso + "-03:00")) / 3.6e6;
+    add({
+      label: "Antigüedad de la última carga", count: Math.round(ageH), total: 48,
+      result: `${nf.format(Math.round(ageH))} h`,
+      status: ageH > 48 ? "warn" : "ok",
+      desc: "Horas desde la última generación de datos. Se marca atención después de 48 horas.",
+    });
+
+    return out;
+  }
+
+  function renderQuality() {
+    const checks = qualityChecks(S.rows, S.b);
+    const rank = { crit: 0, warn: 1, info: 2, ok: 3 };
+    checks.sort((a, b) => rank[a.status] - rank[b.status]);
+    const counts = { crit: 0, warn: 0, ok: 0, info: 0 };
+    for (const c of checks) counts[c.status]++;
+    $("qualitySummary").innerHTML = ["crit", "warn", "ok", "info"]
+      .map(s => `<span class="q-chip q-${s}">${counts[s]} ${QUALITY_TXT[s].toLowerCase()}</span>`).join("");
+    $("qualityBody").innerHTML = checks.map(c => {
+      const more = c.count > c.examples.length ? ` de ${nf.format(c.count)}` : "";
+      const ex = c.examples.length
+        ? `<details><summary>Ver casos (${nf.format(c.examples.length)}${more})</summary><ul class="q-list">` +
+          c.examples.map(x => `<li>${x.u ? `<a href="${esc(x.u)}" target="_blank" rel="noopener">${esc(x.t)}</a>` : esc(x.t)} <span class="muted">${esc(x.meta)}</span></li>`).join("") +
+          `</ul></details>`
+        : "";
+      return `<tr><td>${esc(c.label)}</td><td class="num">${c.result}</td>` +
+        `<td><span class="q-badge q-${c.status}">${QUALITY_TXT[c.status]}</span></td>` +
+        `<td>${esc(c.desc)}${ex}</td></tr>`;
+    }).join("");
+  }
+
+  /* ---------- Informes ---------- */
+
+  const REPORTS = [
+    { id: "secAud", label: "Producción vs. audiencia" },
+    { id: "spon", label: "Patrocinados vs. editorial" },
+    { id: "conc", label: "Concentración de audiencia" },
+    { id: "noAud", label: "Notas sin audiencia" },
+    { id: "titles", label: "Análisis de titulares" },
+  ];
+  const REP = { current: "secAud" };
+
+  // Métricas de Marfeel de una fila (o null) si el periodo está cubierto.
+  const mfOf = r => (mfCovers(S.b) ? mfIndex().get(r.p + "|" + normUrl(r.u)) || null : null);
+  // Notas editoriales publicadas con datos de Marfeel
+  const matched = rows => rows.reduce((out, r) => {
+    const h = mfOf(r);
+    if (h) out.push({ r, pv: h.pageviews, us: h.users });
+    return out;
+  }, []);
+  const pubEd = rows => rows.filter(isEd);
+  const pct = x => `${nf1.format(x * 100)} %`;
+  const median = arr => {
+    if (!arr.length) return null;
+    const s = [...arr].sort((a, b) => a - b), m = s.length >> 1;
+    return s.length % 2 ? s[m] : (s[m - 1] + s[m]) / 2;
+  };
+  const table = (heads, body) =>
+    `<div class="table-wrap"><table><thead><tr>${heads.map(h => `<th${h.num ? ' class="num"' : ""}>${h.t}</th>`).join("")}</tr></thead><tbody>${body}</tbody></table></div>`;
+
+  const REPORT_FN = {
+    // 1. Producción vs. audiencia por sección
+    secAud() {
+      const on = mfCovers(S.b);
+      const ed = pubEd(S.rows);
+      const m = on ? matched(ed) : [];
+      const totalPv = m.reduce((a, x) => a + x.pv, 0);
+      const sec = new Map();
+      for (const r of ed) {
+        if (!sec.has(r.s)) sec.set(r.s, { n: 0, pv: 0 });
+        sec.get(r.s).n++;
+      }
+      for (const x of m) sec.get(x.r.s).pv += x.pv;
+      const rows = [...sec.entries()].map(([s, o]) => {
+        const prodPct = o.n / ed.length * 100;
+        const audPct = on && totalPv ? o.pv / totalPv * 100 : null;
+        const idx = audPct !== null && prodPct > 0 ? audPct / prodPct : null;
+        return { s, n: o.n, prodPct, pv: on ? o.pv : null, audPct, idx };
+      }).sort((a, b) => b.n - a.n);
+      const lectura = x => x.idx === null ? "—" : x.idx >= 1.2 ? "Audiencia por encima de la producción"
+        : x.idx <= 0.8 ? "Producción por encima de la audiencia" : "En equilibrio";
+      const cls = x => x.idx === null ? "" : x.idx >= 1.2 ? "idx-hi" : x.idx <= 0.8 ? "idx-lo" : "";
+      const body = rows.map(x => `<tr>
+          <td>${esc(x.s)}</td><td class="num">${nf.format(x.n)}</td><td class="num">${pct(x.prodPct / 100)}</td>
+          <td class="num">${x.pv === null ? "—" : nf.format(x.pv)}</td>
+          <td class="num">${x.audPct === null ? "—" : pct(x.audPct / 100)}</td>
+          <td class="num ${cls(x)}">${x.idx === null ? "—" : nf2.format(x.idx)}</td>
+          <td>${lectura(x)}</td></tr>`).join("");
+      const chart = on && rows.length ? {
+        type: "bar",
+        data: { labels: rows.map(x => x.s), datasets: [
+          { label: "% producción", data: rows.map(x => x.prodPct), backgroundColor: "#A3ABBA", borderRadius: 4 },
+          { label: "% audiencia", data: rows.map(x => x.audPct), backgroundColor: portalOf(S.portal).color, borderRadius: 4 },
+        ] },
+        options: { indexAxis: "y", responsive: true, maintainAspectRatio: false,
+          plugins: { legend: { position: "bottom" } }, scales: { x: { beginAtZero: true } } },
+      } : null;
+      return {
+        note: on ? "Índice = % audiencia ÷ % producción. 1,00 significa proporcional. Sobre 1,20, la audiencia supera a la producción; bajo 0,80, la producción supera a la audiencia." : esc(mfNote(S.b)),
+        html: (chart ? `<div class="rep-chart"><canvas id="repChart" role="img" aria-label="Producción y audiencia por sección"></canvas></div>` : "") +
+          table([{ t: "Sección" }, { t: "Publicadas", num: true }, { t: "% producción", num: true }, { t: "Páginas vistas", num: true },
+            { t: "% audiencia", num: true }, { t: "Índice", num: true }, { t: "Lectura" }], body),
+        chart,
+      };
+    },
+
+    // 2. Patrocinados vs. editorial, por portal
+    spon() {
+      const on = mfCovers(S.b);
+      const body = PORTALS.map(p => {
+        const pubs = portalRows(p.id, S.b).filter(r => r.st === "p");
+        const portalPv = matched(pubs).reduce((a, x) => a + x.pv, 0);
+        return [["Editorial", r => !r.sp], ["Patrocinado", r => r.sp === 1]].map(([label, pred]) => {
+          const set = pubs.filter(pred);
+          const m = on ? matched(set) : [];
+          const pv = m.reduce((a, x) => a + x.pv, 0), us = m.reduce((a, x) => a + x.us, 0);
+          return `<tr>
+            <td>${esc(p.name)}</td><td>${label}</td>
+            <td class="num">${nf.format(set.length)}</td>
+            <td class="num">${pct(set.length / pubs.length)}</td>
+            <td class="num">${on ? nf.format(pv) : "—"}</td>
+            <td class="num">${on && portalPv ? pct(pv / portalPv) : "—"}</td>
+            <td class="num">${m.length ? nf.format(Math.round(pv / m.length)) : "—"}</td>
+            <td class="num">${m.length ? nf.format(Math.round(us / m.length)) : "—"}</td></tr>`;
+        }).join("");
+      }).join("");
+      return {
+        note: on ? "Cada tipo se compara dentro de su portal. Por nota = promedio sobre las notas con datos de Marfeel." : esc(mfNote(S.b)),
+        html: table([{ t: "Portal" }, { t: "Tipo" }, { t: "Publicadas", num: true }, { t: "% publicadas", num: true },
+          { t: "Páginas vistas", num: true }, { t: "% páginas vistas", num: true }, { t: "PV por nota", num: true }, { t: "Usuarios por nota", num: true }], body),
+      };
+    },
+
+    // 3. Concentración de audiencia (portal seleccionado)
+    conc() {
+      const m = matched(pubEd(S.rows)).sort((a, b) => b.pv - a.pv);
+      if (!m.length) return { note: esc(mfNote(S.b)) || "Sin notas con datos de Marfeel en el periodo.", html: "" };
+      const total = m.reduce((a, x) => a + x.pv, 0);
+      let cum = 0, k50 = 0;
+      for (const x of m) { cum += x.pv; k50++; if (cum >= total / 2) break; }
+      const tiers = [0.01, 0.05, 0.10, 0.20, 0.50].map(p => {
+        const k = Math.max(1, Math.ceil(p * m.length));
+        const pvK = m.slice(0, k).reduce((a, x) => a + x.pv, 0);
+        return `<tr><td>Top ${p * 100} %</td><td class="num">${nf.format(k)}</td><td class="num">${pct(k / m.length)}</td>
+          <td class="num">${nf.format(pvK)}</td><td class="num">${pct(pvK / total)}</td></tr>`;
+      }).join("");
+      const top = m.slice(0, 10).map(x => `<tr>
+          <td class="title"><a href="${esc(x.r.u)}" target="_blank" rel="noopener">${esc(x.r.t)}</a></td>
+          <td><span class="chip">${esc(x.r.s)}</span></td><td class="num">${nf.format(x.pv)}</td></tr>`).join("");
+      return {
+        note: `Notas que suman el 50 % de las páginas vistas: ${nf.format(k50)} de ${nf.format(m.length)} (${pct(k50 / m.length)}).`,
+        html: `<h3 class="rep-h">Participación por tramo de notas</h3>` +
+          table([{ t: "Tramo" }, { t: "Notas", num: true }, { t: "% notas", num: true }, { t: "Páginas vistas", num: true }, { t: "% páginas vistas", num: true }], tiers) +
+          `<h3 class="rep-h">Diez notas con más páginas vistas</h3>` +
+          table([{ t: "Artículo" }, { t: "Sección" }, { t: "Páginas vistas", num: true }], top),
+      };
+    },
+
+    // 4. Notas publicadas sin registro en Marfeel
+    noAud() {
+      if (!mfCovers(S.b)) return { note: esc(mfNote(S.b)), html: "" };
+      const ed = pubEd(S.rows);
+      const un = ed.filter(r => !mfOf(r));
+      const secs = new Map(), auths = new Map();
+      for (const r of un) {
+        secs.set(r.s, (secs.get(r.s) || 0) + 1);
+        auths.set(r.a, (auths.get(r.a) || 0) + 1);
+      }
+      const secBody = [...secs].sort((a, b) => b[1] - a[1])
+        .map(([s, n]) => `<tr><td>${esc(s)}</td><td class="num">${nf.format(n)}</td></tr>`).join("");
+      const authBody = [...auths].sort((a, b) => b[1] - a[1]).slice(0, 10)
+        .map(([a, n]) => `<tr><td>${esc(a)}</td><td class="num">${nf.format(n)}</td></tr>`).join("");
+      const listBody = un.slice(0, 200).map(r => `<tr>
+          <td class="nowrap">${fmtYmd(r.d)}</td><td><span class="chip">${esc(r.s)}</span></td>
+          <td class="title"><a href="${esc(r.u)}" target="_blank" rel="noopener">${esc(r.t)}</a></td><td>${esc(r.a)}</td></tr>`).join("");
+      return {
+        note: `${nf.format(un.length)} de ${nf.format(ed.length)} publicadas (${pct(ed.length ? un.length / ed.length : 0)}) no tienen registro en Marfeel. Pueden ser notas recientes con poco tiempo de exposición o URLs que no coinciden; revisa antes de concluir que no tuvieron audiencia.`,
+        html: `<h3 class="rep-h">Por sección</h3>` + table([{ t: "Sección" }, { t: "Notas", num: true }], secBody) +
+          `<h3 class="rep-h">Periodistas con más notas sin registro (top 10)</h3>` + table([{ t: "Periodista" }, { t: "Notas", num: true }], authBody) +
+          `<h3 class="rep-h">Listado${un.length > 200 ? " (primeras 200)" : ""}</h3>` +
+          table([{ t: "Fecha" }, { t: "Sección" }, { t: "Título" }, { t: "Periodista" }], listBody),
+      };
+    },
+
+    // 5. Análisis de titulares
+    titles() {
+      const m = matched(pubEd(S.rows));
+      if (!m.length) return { note: esc(mfNote(S.b)) || "Sin notas con datos de Marfeel en el periodo.", html: "" };
+      const overall = median(m.map(x => x.pv));
+      const feats = [
+        ["Longitud del titular", [["Menos de 60 caracteres", t => t.length < 60], ["60 a 79 caracteres", t => t.length >= 60 && t.length < 80],
+          ["80 a 99 caracteres", t => t.length >= 80 && t.length < 100], ["100 o más caracteres", t => t.length >= 100]]],
+        ["Número en el titular", [["Con número", t => /\d/.test(t)], ["Sin número", t => !/\d/.test(t)]]],
+        ["Pregunta en el titular", [["Con signo de pregunta", t => t.includes("?")], ["Sin signo de pregunta", t => !t.includes("?")]]],
+      ];
+      const body = feats.map(([name, groups]) => groups.map(([label, pred]) => {
+        const g = m.filter(x => pred(x.r.t)).map(x => x.pv);
+        const med = median(g);
+        return `<tr><td>${name}</td><td>${label}</td><td class="num">${nf.format(g.length)}</td>
+          <td class="num">${med === null ? "—" : nf.format(Math.round(med))}</td>
+          <td class="num">${med === null || !overall ? "—" : nf.format(Math.round(med / overall * 100))}</td></tr>`;
+      }).join("")).join("");
+      return {
+        note: `Mediana general: ${nf.format(Math.round(overall))} páginas vistas por nota. El índice compara la mediana de cada grupo con la general (100 = igual). Son asociaciones: no controlan por sección ni por fecha de publicación.`,
+        html: table([{ t: "Característica" }, { t: "Grupo" }, { t: "Notas", num: true }, { t: "Mediana PV", num: true }, { t: "Índice (100 = general)", num: true }], body),
+      };
+    },
+  };
+
+  function renderReports() {
+    const rep = $("reportDialog");
+    $("repSub").textContent = `${portalOf(S.portal).name} · ${fmtYmd(S.b.from)} – ${fmtYmd(S.b.to)}`;
+    $("repTabs").innerHTML = REPORTS.map(r =>
+      `<button type="button" role="tab" data-r="${r.id}" aria-selected="${r.id === REP.current}">${r.label}</button>`).join("");
+    if (S.charts.rep) { S.charts.rep.destroy(); delete S.charts.rep; }
+    const out = REPORT_FN[REP.current]();
+    $("repNote").innerHTML = out.note ? `<p class="note" style="margin-top:0">${out.note}</p>` : "";
+    $("repBody").innerHTML = out.html;
+    if (out.chart) drawChart("rep", "repChart", out.chart);
+    return rep;
+  }
+
+  /* ---------- Flujo ---------- */
+
+  function renderAll() {
+    S.b = bounds();
+    S.rows = portalRows(S.portal, S.b);
+    mfEnrich();
+    renderHeader();
+    renderQuality();
+    renderComparison();
+    renderKPIs();
+    renderDaily();
+    renderSections();
+    renderHeatmap();
+    renderAudience();
+    renderTopics();
+    renderFilters();
+    renderAuthors();
+    renderArticles();
+    if ($("reportDialog").open) renderReports();
+  }
+
+  function setPortal(pid) {
+    S.portal = pid;
+    S.sec = ""; S.fmt = ""; S.page = 1;
+    renderAll();
+  }
+
+  function debounce(fn, ms = 150) { let t; return (...a) => { clearTimeout(t); t = setTimeout(() => fn(...a), ms); }; }
+
+  function init() {
+    $("genAt").textContent = DATA.generated;
+    $("monthSel").innerHTML = MONTHS.slice().reverse().map(m => `<option value="${m}">${monthLong(m)}</option>`).join("");
+    $("yearSel").innerHTML = YEARS.slice().reverse().map(y => `<option value="${y}">${y}</option>`).join("");
+    for (const id of ["fromDate", "toDate"]) { $(id).min = MIN_DATE; $(id).max = MAX_DATE; }
+
+    $("tabs").addEventListener("click", e => {
+      const b = e.target.closest("button[data-p]");
+      if (b) setPortal(b.dataset.p);
+    });
+    $("compBody").addEventListener("click", e => {
+      const tr = e.target.closest("tr[data-p]");
+      if (tr) setPortal(tr.dataset.p);
+    });
+
+    $("periodMode").addEventListener("change", e => {
+      const current = bounds();
+      S.mode = e.target.value;
+      if (S.mode === "range") { S.from = current.from; S.to = current.to; }
+      $("presetSel").value = "";
+      S.page = 1;
+      renderAll();
+    });
+    $("monthSel").addEventListener("change", e => { S.month = e.target.value; S.page = 1; renderAll(); });
+    $("yearSel").addEventListener("change", e => { S.year = e.target.value; S.page = 1; renderAll(); });
+
+    const onDates = () => {
+      let from = $("fromDate").value, to = $("toDate").value;
+      if (!from || !to) return;
+      if (from > to) [from, to] = [to, from];
+      S.from = from; S.to = to;
+      $("presetSel").value = "";
+      S.page = 1;
+      renderAll();
+    };
+    $("fromDate").addEventListener("change", onDates);
+    $("toDate").addEventListener("change", onDates);
+
+    $("presetSel").addEventListener("change", e => {
+      const v = e.target.value;
+      if (!v) return;
+      if (v === "all") { S.from = MIN_DATE; S.to = MAX_DATE; }
+      else { S.to = MAX_DATE; S.from = addDays(MAX_DATE, -(Number(v) - 1)); }
+      S.mode = "range";
+      S.page = 1;
+      renderAll();
+      $("presetSel").value = v;
+    });
+
+
+    $("cloud").addEventListener("click", e => {
+      const b = e.target.closest("button[data-w]");
+      if (!b) return;
+      S.q = b.dataset.w;
+      S.page = 1;
+      $("articleSearch").value = S.q;
+      renderArticles();
+      $("articlesCard").scrollIntoView({ behavior: "smooth", block: "start" });
+    });
+
+    $("authorSearch").addEventListener("input", debounce(e => { S.aq = e.target.value; renderAuthors(); }));
+    $("articleSearch").addEventListener("input", debounce(e => { S.q = e.target.value; S.page = 1; renderArticles(); }));
+    $("sectionFilter").addEventListener("change", e => { S.sec = e.target.value; S.page = 1; renderArticles(); });
+    $("fmtFilter").addEventListener("change", e => { S.fmt = e.target.value; S.page = 1; renderArticles(); });
+    $("statusFilter").addEventListener("change", e => { S.kind = e.target.value; S.page = 1; renderArticles(); });
+    $("prevPage").addEventListener("click", () => { S.page--; renderArticles(); });
+    $("nextPage").addEventListener("click", () => { S.page++; renderArticles(); });
+    document.querySelectorAll("th[data-k]").forEach(th => {
+      th.addEventListener("click", () => sortAuthors(th.dataset.k));
+      th.addEventListener("keydown", e => {
+        if (e.key === "Enter" || e.key === " ") { e.preventDefault(); sortAuthors(th.dataset.k); }
+      });
+    });
+
+    $("hmMetric").addEventListener("change", e => { S.hm = e.target.value; renderHeatmap(); });
+    const dlg = $("audienceCard");
+    const setPressed = v => $("audToggle").setAttribute("aria-pressed", String(v));
+    const openDlg = () => {
+      if (typeof dlg.showModal === "function") dlg.showModal(); else dlg.setAttribute("open", "");
+      setPressed(true);
+    };
+    const closeDlg = () => {
+      if (typeof dlg.close === "function") dlg.close();
+      else { dlg.removeAttribute("open"); dlg.dispatchEvent(new Event("close")); }
+    };
+    $("audToggle").addEventListener("click", () => (dlg.open ? closeDlg() : openDlg()));
+    $("audClose").addEventListener("click", closeDlg);
+    dlg.addEventListener("close", () => setPressed(false));
+    dlg.addEventListener("click", e => { if (e.target === dlg) closeDlg(); });
+
+    const rep = $("reportDialog");
+    const setRepPressed = v => $("repToggle").setAttribute("aria-pressed", String(v));
+    const openRep = () => {
+      if (typeof rep.showModal === "function") rep.showModal(); else rep.setAttribute("open", "");
+      setRepPressed(true);
+      renderReports();
+    };
+    const closeRep = () => {
+      if (typeof rep.close === "function") rep.close();
+      else { rep.removeAttribute("open"); rep.dispatchEvent(new Event("close")); }
+    };
+    $("repToggle").addEventListener("click", () => (rep.open ? closeRep() : openRep()));
+    $("repClose").addEventListener("click", closeRep);
+    rep.addEventListener("close", () => setRepPressed(false));
+    rep.addEventListener("click", e => { if (e.target === rep) closeRep(); });
+    $("repTabs").addEventListener("click", e => {
+      const b = e.target.closest("button[data-r]");
+      if (b) { REP.current = b.dataset.r; renderReports(); }
+    });
+
+    renderAll();
+  }
+
+  init();
+})().catch(showError);
+</script>
+</body>
+</html>
